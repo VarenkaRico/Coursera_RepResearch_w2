@@ -3,7 +3,6 @@ output:
   html_document: 
     keep_md: yes
 ---
-
 # Activity monitoring analysis
 author: "Varenka Rico"
 date: "2023-11-01"
@@ -87,7 +86,7 @@ ggplot(data = df_5min_periods, aes(x=date, y=num_periods)) +
 
 ![](figures/barplot_5min_periods-1.png)<!-- -->
 
-## Steps by day
+### Steps by day
 
 To determine the total number of steps taken each day, it is necessary to sum the steps in each 5-minute period for each day first.
 
@@ -142,7 +141,7 @@ summary(df_by_day)
 The **mean** number of steps was 10766 steps.  
 The **median** number of steps was 10765 steps.
 
-## Review of the 5-minute interval information
+### 5-minute interval information
 
 ```r
 df_avg_by_day <- aggregate(raw_data$steps, by = list(ymd(raw_data$date)), FUN = mean)
@@ -177,7 +176,7 @@ ggplot(data = df_avg_by_interval, aes(x=interval, y=mean_steps)) +
 
 ![](figures/line_plot_interval-1.png)<!-- -->
 
-### Filling NA's with average interval steps
+#### Filling NA's with average interval steps
 NA's values will be filled with the average of each 5-minute interval will be added in order to avoid impacting the overall average registered.
 
 
