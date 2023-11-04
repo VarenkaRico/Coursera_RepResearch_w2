@@ -2,7 +2,10 @@
 title: "Activity monitoring analysis"
 author: "Varenka Rico"
 date: "2023-11-01"
-output: html_document
+output:
+  html_document: 
+    fig_width: 8
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -60,7 +63,7 @@ To make sure all the days have 288 5-minute periods, it is necessary to count th
 df_5min_periods <- aggregate(raw_data$steps, by = list(ymd(raw_data$date)), FUN = length)
 df_5min_periods <- setNames(df_5min_periods, c("date", "num_periods"))
 ```
-```{r barplot_5min_periods}
+```{r barplot_5min_periods, fig.path = "figures/"}
 ggplot(data = df_5min_periods, aes(x=date, y=num_periods)) +
   geom_bar(stat="identity") +
   labs(title = "Total 5-minute periods per day")
@@ -74,12 +77,12 @@ To determine the total number of steps taken each day, it is necessary to sum th
 df_by_day <- aggregate(raw_data$steps, by = list(ymd(raw_data$date)), FUN = sum)
 df_by_day <- setNames(df_by_day, c("date", "steps"))
 ```
-```{r bar_plot}
+```{r bar_plot, fig.path = "figures/"}
 ggplot(data = df_by_day, aes(x=date, y=steps)) +
   geom_bar(stat="identity") +
   labs(title = "Total steps by day")
 ```
-```{r Histogram_StepsByDay}
+```{r Histogram_StepsByDay, fig.path = "figures/"}
 
 ggplot(data = df_by_day, aes(x=steps)) +
   geom_histogram(bins = 10) +
@@ -103,7 +106,7 @@ df_avg_by_day <- aggregate(raw_data$steps, by = list(ymd(raw_data$date)), FUN = 
 df_avg_by_day <- setNames(df_avg_by_day, c("date", "mean_steps"))
 ```
 For the 5-minute range per day average
-```{r line_plot}
+```{r line_plot, fig.path = "figures/"}
 ggplot(data = df_avg_by_day, aes(x=date, y=mean_steps)) +
   geom_line () +
   labs(title = "Mean steps in the 5-minute range by day")
@@ -114,7 +117,7 @@ df_avg_by_interval <- aggregate(raw_data$steps, by = list(raw_data$interval), FU
 df_avg_by_interval <- setNames(df_avg_by_interval, c("interval", "mean_steps"))
 ```
 The highest 5-minute intervals are around 8am with some peaks at 15hrs, 13hrs and 18hrs. The initial part of the day, before 5am, the number of steps is near to zero, and after 19hrs it starts to decrease till the end of the day. This activity registration makes sense of what could be expected.
-```{r line_plot_interval}
+```{r line_plot_interval, fig.path = "figures/"}
 ggplot(data = df_avg_by_interval, aes(x=interval, y=mean_steps)) +
   geom_line () +
   labs(title = "Mean steps by the 5-minute intervals")
@@ -138,7 +141,7 @@ for (i in 1:nrow(df_avg_by_interval)) {
 df_filled_na_by_day <- aggregate(df_filled_na$steps, by = list(ymd(df_filled_na$date)), FUN = sum)
 df_filled_na_by_day <- setNames(df_filled_na_by_day, c("date", "steps"))
 ```
-```{r Bar_StepsByDay_filledNA}
+```{r Bar_StepsByDay_filledNA, fig.path = "figures/"}
 ggplot(data = df_filled_na_by_day, aes(x=date, y=steps)) +
   geom_bar(stat="identity") +
   labs(title = "Total steps by day")
@@ -146,7 +149,7 @@ ggplot(data = df_filled_na_by_day, aes(x=date, y=steps)) +
 
 To make sure the filling of missing values did not affect the general behavior previously reviewed, here are the General Stats and the Histogram for the completed table.
 
-```{r Histogram_StepsByDay_filledNA}
+```{r Histogram_StepsByDay_filledNA, fig.path = "figures/"}
 
 ggplot(data = df_filled_na_by_day, aes(x=steps)) +
   geom_histogram(bins = 10) +
@@ -177,7 +180,7 @@ mean_weekdays <- round(mean(df_day_type$steps[df_day_type$Day == "weekday"], na.
 mean_weekends <- round(mean(df_day_type$steps[df_day_type$Day == "weekend"], na.rm = TRUE),0)
 ```
 During the weekdays it seems to be higher variance and the mean is `r mean_weekdays`. For weekends, the mean is `r mean_weekends`.
-```{r Histogram_by_day_type}
+```{r Histogram_by_day_type, fig.path = "figures/"}
 
 ggplot(data = df_day_type, aes(y=steps)) +
   geom_boxplot() +
