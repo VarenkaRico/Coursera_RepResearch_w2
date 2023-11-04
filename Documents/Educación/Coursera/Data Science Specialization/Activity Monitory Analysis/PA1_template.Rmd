@@ -1,13 +1,12 @@
 ---
-title: "Activity monitoring analysis"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+# Activity monitoring analysis
 author: "Varenka Rico"
 date: "2023-11-01"
-output:
-  html_document: 
-    keep_md: true
-    fig_width: 8
-  pdf_document: default
----
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -89,7 +88,9 @@ ggplot(data = df_by_day, aes(x=steps)) +
   geom_histogram(bins = 10) +
   labs(title = "Histogram of steps-by-day")
 ```
+  
 The general stats per day are:
+
 ```{r GeneralStat_Day}
 
 summary(df_by_day)
@@ -112,17 +113,22 @@ ggplot(data = df_avg_by_day, aes(x=date, y=mean_steps)) +
   geom_line () +
   labs(title = "Mean steps in the 5-minute range by day")
 ```
+  
 As it is natural, there are 5-minute intervals with higher and lower activity through the day.
+
 ```{r df_avg_by_interval, results = 'hide', echo = FALSE, include = TRUE}
 df_avg_by_interval <- aggregate(raw_data$steps, by = list(raw_data$interval), FUN = mean, na.rm = TRUE)
 df_avg_by_interval <- setNames(df_avg_by_interval, c("interval", "mean_steps"))
 ```
+  
 The highest 5-minute intervals are around 8am with some peaks at 15hrs, 13hrs and 18hrs. The initial part of the day, before 5am, the number of steps is near to zero, and after 19hrs it starts to decrease till the end of the day. This activity registration makes sense of what could be expected.
+
 ```{r line_plot_interval, fig.path = "figures/"}
 ggplot(data = df_avg_by_interval, aes(x=interval, y=mean_steps)) +
   geom_line () +
   labs(title = "Mean steps by the 5-minute intervals")
 ```
+
 ### Filling NA's with average interval steps
 NA's values will be filled with the average of each 5-minute interval will be added in order to avoid impacting the overall average registered.
 
@@ -156,7 +162,9 @@ ggplot(data = df_filled_na_by_day, aes(x=steps)) +
   geom_histogram(bins = 10) +
   labs(title = "Histogram of steps-by-day (filled NAs)")
 ```
+  
 The general stats per day are:
+
 ```{r GeneralStat_Day_filledNA}
 
 summary(df_filled_na_by_day)
@@ -165,10 +173,11 @@ summary(df_filled_na_by_day)
 mean_steps_filledNA <- round(mean(df_filled_na_by_day$steps, na.rm = TRUE),0)
 median_steps_filledNA <- median(df_filled_na_by_day$steps, na.rm = TRUE)
 ```
+  
 The **mean** number of steps was `r mean_steps` steps.  
 The **median** number of steps was `r median_steps` steps. 
 The **mean** and **median** remained almost equal, showing this method of filling out missing values worked as expected.  
-And as it was expected, the 1st Quartile and 3rd Quartile did have some change due to the add of values around in the mean range.
+And as it was expected, the 1st Quartile and 3rd Quartile did have some change due to the add of values around in the mean range.  
 
 ### Weekdays Vs Weekends
 ```{r weekdays_Vs_weekends, results = 'hide', echo = FALSE, include = TRUE}
@@ -180,7 +189,9 @@ df_day_type["Day"] <- factor((weekdays(df_day_type$date) %in% lst_weekends),
 mean_weekdays <- round(mean(df_day_type$steps[df_day_type$Day == "weekday"], na.rm = TRUE),0)
 mean_weekends <- round(mean(df_day_type$steps[df_day_type$Day == "weekend"], na.rm = TRUE),0)
 ```
+  
 During the weekdays it seems to be higher variance and the mean is `r mean_weekdays`. For weekends, the mean is `r mean_weekends`.
+
 ```{r Histogram_by_day_type, fig.path = "figures/"}
 
 ggplot(data = df_day_type, aes(y=steps)) +

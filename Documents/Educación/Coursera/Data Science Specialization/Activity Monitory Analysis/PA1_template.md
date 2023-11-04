@@ -1,13 +1,12 @@
 ---
-title: "Activity monitoring analysis"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+# Activity monitoring analysis
 author: "Varenka Rico"
 date: "2023-11-01"
-output:
-  html_document: 
-    keep_md: true
-    fig_width: 8
-  pdf_document: default
----
 
 
 
@@ -121,7 +120,9 @@ ggplot(data = df_by_day, aes(x=steps)) +
 ```
 
 ![](figures/Histogram_StepsByDay-1.png)<!-- -->
+  
 The general stats per day are:
+
 
 ```r
 summary(df_by_day)
@@ -160,9 +161,13 @@ ggplot(data = df_avg_by_day, aes(x=date, y=mean_steps)) +
 ```
 
 ![](figures/line_plot-1.png)<!-- -->
+  
 As it is natural, there are 5-minute intervals with higher and lower activity through the day.
 
+
+  
 The highest 5-minute intervals are around 8am with some peaks at 15hrs, 13hrs and 18hrs. The initial part of the day, before 5am, the number of steps is near to zero, and after 19hrs it starts to decrease till the end of the day. This activity registration makes sense of what could be expected.
+
 
 ```r
 ggplot(data = df_avg_by_interval, aes(x=interval, y=mean_steps)) +
@@ -171,6 +176,7 @@ ggplot(data = df_avg_by_interval, aes(x=interval, y=mean_steps)) +
 ```
 
 ![](figures/line_plot_interval-1.png)<!-- -->
+
 ### Filling NA's with average interval steps
 NA's values will be filled with the average of each 5-minute interval will be added in order to avoid impacting the overall average registered.
 
@@ -211,7 +217,9 @@ ggplot(data = df_filled_na_by_day, aes(x=steps)) +
 ```
 
 ![](figures/Histogram_StepsByDay_filledNA-1.png)<!-- -->
+  
 The general stats per day are:
+
 
 ```r
 summary(df_filled_na_by_day)
@@ -227,14 +235,17 @@ summary(df_filled_na_by_day)
 ##  Max.   :2012-11-30   Max.   :21194
 ```
 
+  
 The **mean** number of steps was 10766 steps.  
 The **median** number of steps was 10765 steps. 
 The **mean** and **median** remained almost equal, showing this method of filling out missing values worked as expected.  
-And as it was expected, the 1st Quartile and 3rd Quartile did have some change due to the add of values around in the mean range.
+And as it was expected, the 1st Quartile and 3rd Quartile did have some change due to the add of values around in the mean range.  
 
 ### Weekdays Vs Weekends
 
+  
 During the weekdays it seems to be higher variance and the mean is 10177. For weekends, the mean is 12407.
+
 
 ```r
 ggplot(data = df_day_type, aes(y=steps)) +
