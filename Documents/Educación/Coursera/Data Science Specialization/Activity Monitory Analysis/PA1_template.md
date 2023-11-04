@@ -9,12 +9,7 @@ output:
   pdf_document: default
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-library(tidyverse)
-library(lubridate)
-options(scipen=999)
-```
+
 
 ## Abstract
 
@@ -29,7 +24,8 @@ library(lubridate)
 ### Getting information
 In order to avoid downloading any file into the computer, a temp file is created. The information was downloaded on November 1st, 2023.
 
-```{r download}
+
+```r
 temp <- tempfile()
 download.file("https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip?raw=TRUE", 
               temp, mode = "wb")
@@ -43,90 +39,143 @@ The table has 3 columns:
 **steps:** Number of steps taking in a 5-minute interval (missing values are coded as NA)  
 **date:** The date on which the measurement was taken in YYYY-MM-DD format  
 **interval:** Identifier for the 5-minute interval in which measurement was taken  
-```{r initial_analysis}
-head(raw_data)
 
+```r
+head(raw_data)
+```
+
+```
+##   steps       date interval
+## 1    NA 2012-10-01        0
+## 2    NA 2012-10-01        5
+## 3    NA 2012-10-01       10
+## 4    NA 2012-10-01       15
+## 5    NA 2012-10-01       20
+## 6    NA 2012-10-01       25
+```
+
+```r
 summary(raw_data)
 ```
-```{r initial_values, results = 'hide', echo = FALSE, include = TRUE}
-na_steps <- sum(is.na (raw_data$steps))
-
-na_days_table <- raw_data[is.na(raw_data$steps) == TRUE,]
-na_days <- unique(na_days_table$date)
 
 ```
+##      steps            date              interval     
+##  Min.   :  0.00   Length:17568       Min.   :   0.0  
+##  1st Qu.:  0.00   Class :character   1st Qu.: 588.8  
+##  Median :  0.00   Mode  :character   Median :1177.5  
+##  Mean   : 37.38                      Mean   :1177.5  
+##  3rd Qu.: 12.00                      3rd Qu.:1766.2  
+##  Max.   :806.00                      Max.   :2355.0  
+##  NA's   :2304
+```
+
 #### Missing data - Identification
-There are `r na_steps` NAs in the data. All of them for the days `r na_days`.
+There are 2304 NAs in the data. All of them for the days 2012-10-01, 2012-10-08, 2012-11-01, 2012-11-04, 2012-11-09, 2012-11-10, 2012-11-14, 2012-11-30.
 
 To make sure all the days have 288 5-minute periods, it is necessary to count the number of measurements done each day and plot it.
 
-```{r df_5min_periods, results = 'hide'}
+
+```r
 df_5min_periods <- aggregate(raw_data$steps, by = list(ymd(raw_data$date)), FUN = length)
 df_5min_periods <- setNames(df_5min_periods, c("date", "num_periods"))
 ```
-```{r barplot_5min_periods, fig.path = "figures/"}
+
+```r
 ggplot(data = df_5min_periods, aes(x=date, y=num_periods)) +
   geom_bar(stat="identity") +
   labs(title = "Total 5-minute periods per day")
 ```
 
+![](figures/barplot_5min_periods-1.png)<!-- -->
+
 ## Steps by day
 
 To determine the total number of steps taken each day, it is necessary to sum the steps in each 5-minute period for each day first.
 
-```{r df_by_day, results = 'hide'}
+
+```r
 df_by_day <- aggregate(raw_data$steps, by = list(ymd(raw_data$date)), FUN = sum)
 df_by_day <- setNames(df_by_day, c("date", "steps"))
 ```
-```{r bar_plot, fig.path = "figures/"}
+
+```r
 ggplot(data = df_by_day, aes(x=date, y=steps)) +
   geom_bar(stat="identity") +
   labs(title = "Total steps by day")
 ```
-```{r Histogram_StepsByDay, fig.path = "figures/"}
 
+```
+## Warning: Removed 8 rows containing missing values (`position_stack()`).
+```
+
+![](figures/bar_plot-1.png)<!-- -->
+
+```r
 ggplot(data = df_by_day, aes(x=steps)) +
   geom_histogram(bins = 10) +
   labs(title = "Histogram of steps-by-day")
 ```
-The general stats per day are:
-```{r GeneralStat_Day}
 
+```
+## Warning: Removed 8 rows containing non-finite values (`stat_bin()`).
+```
+
+![](figures/Histogram_StepsByDay-1.png)<!-- -->
+The general stats per day are:
+
+```r
 summary(df_by_day)
 ```
-```{r mean_median_values, results = 'hide', echo = FALSE, include = TRUE}
-mean_steps <- round(mean(df_by_day$steps, na.rm = TRUE),0)
-median_steps <- median(df_by_day$steps, na.rm = TRUE)
+
 ```
-The **mean** number of steps was `r mean_steps` steps.  
-The **median** number of steps was `r median_steps` steps.
+##       date                steps      
+##  Min.   :2012-10-01   Min.   :   41  
+##  1st Qu.:2012-10-16   1st Qu.: 8841  
+##  Median :2012-10-31   Median :10765  
+##  Mean   :2012-10-31   Mean   :10766  
+##  3rd Qu.:2012-11-15   3rd Qu.:13294  
+##  Max.   :2012-11-30   Max.   :21194  
+##                       NA's   :8
+```
+
+The **mean** number of steps was 10766 steps.  
+The **median** number of steps was 10765 steps.
 
 ## Review of the 5-minute interval information
-```{r df_avg_by_day, results = 'hide'}
+
+```r
 df_avg_by_day <- aggregate(raw_data$steps, by = list(ymd(raw_data$date)), FUN = mean)
 df_avg_by_day <- setNames(df_avg_by_day, c("date", "mean_steps"))
 ```
 For the 5-minute range per day average
-```{r line_plot, fig.path = "figures/"}
+
+```r
 ggplot(data = df_avg_by_day, aes(x=date, y=mean_steps)) +
   geom_line () +
   labs(title = "Mean steps in the 5-minute range by day")
 ```
-As it is natural, there are 5-minute intervals with higher and lower activity through the day.
-```{r df_avg_by_interval, results = 'hide', echo = FALSE, include = TRUE}
-df_avg_by_interval <- aggregate(raw_data$steps, by = list(raw_data$interval), FUN = mean, na.rm = TRUE)
-df_avg_by_interval <- setNames(df_avg_by_interval, c("interval", "mean_steps"))
+
 ```
+## Warning: Removed 2 rows containing missing values (`geom_line()`).
+```
+
+![](figures/line_plot-1.png)<!-- -->
+As it is natural, there are 5-minute intervals with higher and lower activity through the day.
+
 The highest 5-minute intervals are around 8am with some peaks at 15hrs, 13hrs and 18hrs. The initial part of the day, before 5am, the number of steps is near to zero, and after 19hrs it starts to decrease till the end of the day. This activity registration makes sense of what could be expected.
-```{r line_plot_interval, fig.path = "figures/"}
+
+```r
 ggplot(data = df_avg_by_interval, aes(x=interval, y=mean_steps)) +
   geom_line () +
   labs(title = "Mean steps by the 5-minute intervals")
 ```
+
+![](figures/line_plot_interval-1.png)<!-- -->
 ### Filling NA's with average interval steps
 NA's values will be filled with the average of each 5-minute interval will be added in order to avoid impacting the overall average registered.
 
-```{r fill_NA}
+
+```r
 df_filled_na <- raw_data
 
 for (i in 1:nrow(df_avg_by_interval)) {
@@ -138,53 +187,64 @@ for (i in 1:nrow(df_avg_by_interval)) {
   
 }
 ```
-```{r df_filled_na_by_day, results = 'hide'}
+
+```r
 df_filled_na_by_day <- aggregate(df_filled_na$steps, by = list(ymd(df_filled_na$date)), FUN = sum)
 df_filled_na_by_day <- setNames(df_filled_na_by_day, c("date", "steps"))
 ```
-```{r Bar_StepsByDay_filledNA, fig.path = "figures/"}
+
+```r
 ggplot(data = df_filled_na_by_day, aes(x=date, y=steps)) +
   geom_bar(stat="identity") +
   labs(title = "Total steps by day")
-```   
+```
+
+![](figures/Bar_StepsByDay_filledNA-1.png)<!-- -->
 
 To make sure the filling of missing values did not affect the general behavior previously reviewed, here are the General Stats and the Histogram for the completed table.
 
-```{r Histogram_StepsByDay_filledNA, fig.path = "figures/"}
 
+```r
 ggplot(data = df_filled_na_by_day, aes(x=steps)) +
   geom_histogram(bins = 10) +
   labs(title = "Histogram of steps-by-day (filled NAs)")
 ```
-The general stats per day are:
-```{r GeneralStat_Day_filledNA}
 
+![](figures/Histogram_StepsByDay_filledNA-1.png)<!-- -->
+The general stats per day are:
+
+```r
 summary(df_filled_na_by_day)
 ```
-```{r mean_median_values_filledNA, results = 'hide', echo = FALSE, include = TRUE}
-mean_steps_filledNA <- round(mean(df_filled_na_by_day$steps, na.rm = TRUE),0)
-median_steps_filledNA <- median(df_filled_na_by_day$steps, na.rm = TRUE)
+
 ```
-The **mean** number of steps was `r mean_steps` steps.  
-The **median** number of steps was `r median_steps` steps. 
+##       date                steps      
+##  Min.   :2012-10-01   Min.   :   41  
+##  1st Qu.:2012-10-16   1st Qu.: 9819  
+##  Median :2012-10-31   Median :10766  
+##  Mean   :2012-10-31   Mean   :10766  
+##  3rd Qu.:2012-11-15   3rd Qu.:12811  
+##  Max.   :2012-11-30   Max.   :21194
+```
+
+The **mean** number of steps was 10766 steps.  
+The **median** number of steps was 10765 steps. 
 The **mean** and **median** remained almost equal, showing this method of filling out missing values worked as expected.  
 And as it was expected, the 1st Quartile and 3rd Quartile did have some change due to the add of values around in the mean range.
 
 ### Weekdays Vs Weekends
-```{r weekdays_Vs_weekends, results = 'hide', echo = FALSE, include = TRUE}
-df_day_type <- df_by_day
-df_day_type$date <- as.Date(df_day_type$date)
-lst_weekends <- c("sábado", "domingo")
-df_day_type["Day"] <- factor((weekdays(df_day_type$date) %in% lst_weekends),
-                                 levels = c(FALSE, TRUE), labels = c("weekday", "weekend"))
-mean_weekdays <- round(mean(df_day_type$steps[df_day_type$Day == "weekday"], na.rm = TRUE),0)
-mean_weekends <- round(mean(df_day_type$steps[df_day_type$Day == "weekend"], na.rm = TRUE),0)
-```
-During the weekdays it seems to be higher variance and the mean is `r mean_weekdays`. For weekends, the mean is `r mean_weekends`.
-```{r Histogram_by_day_type, fig.path = "figures/"}
 
+During the weekdays it seems to be higher variance and the mean is 10177. For weekends, the mean is 12407.
+
+```r
 ggplot(data = df_day_type, aes(y=steps)) +
   geom_boxplot() +
   facet_wrap(~Day) +
   labs(title = "Boxplot for Weekends Vs Weekdays")
 ```
+
+```
+## Warning: Removed 8 rows containing non-finite values (`stat_boxplot()`).
+```
+
+![](figures/Histogram_by_day_type-1.png)<!-- -->
